@@ -37,16 +37,16 @@ main()
 #define NUM 50
 struct gongzi
 {
- 	char num[10];         //工号
- 	char name[10];   //姓名
- 	float wage1;        //岗位工资
- 	float wage2;       //薪级工资
- 	float allowance;          // 职务津贴 
-    float insurance;         //绩效保险
- 	float wage3;         //应发工资
+    string ID[10];         //工号
+ 	string name[10];   //姓名
+ 	float postWages;        //岗位工资
+ 	float paySalary;       //薪级工资
+ 	float jobAllowance;          // 职务津贴 
+    float performancePay;         //绩效工资
+ 	float shouldPay;         //应发工资
  	float tax;       //个人所得税
-	float wage4;      //实发工资
-}gz[NUM];      
+	float realWages;      //实发工资
+}gz[NUM],newgz;      
 void menu();
 void read();
 void write();
@@ -95,7 +95,7 @@ void menu() //菜单界面
 /*********************************************************
 Function:read //函数名称
 Description：函数描述。主函数执行时要调用和必须调用的第一个函数。 函数功能。从数据文件中读取职工工资数据、初始化职工工资结构体数组并统计当前数据文件中职工人数，并将职工人数存在全局变量n中，以备其他函数使用。
-Calls:gz.dat
+Calls:gx.dat
 Called by；gzzg[n]
 *********************************************************/
 
@@ -103,9 +103,9 @@ void read()
 	{
      FILE *fp;
      int n,num;
-     if((fp=fopen("gz.dat","rb"))==NULL)
+     if((fp=fopen("gx.dat","rb"))==NULL)
      {
-         printf("不能打开gz文件\n");
+         printf("不能打开gx文件\n");
          exit(1);
      }
 	 printf("请输入工资数:");
@@ -116,21 +116,21 @@ void read()
 		 n++
 	     )
      if(gz[n].wage4>=num);
-     printf("%6d%6s%9s%4s%5d   %.1f   %.1f  %.1f   %.1f   %.1f   %.1f\n",n+1,gz[n].num,gz[n].name,gz[n].wage1,
-             gz[n].wage2,gz[n].allowance,gz[n].insurance,gz[n].wage3,gz[n].tax,gz[n].wage4);
+     printf("%6d%6s%9s%4s%5d   %.1f   %.1f  %.1f   %.1f   %.1f   %.1f\n",n+1,gz[n].ID,gz[n].name,gz[n].postWages,
+             gz[n].paySalary,gz[n].jobAllowance,gz[n].performancePay,gz[n].shouldPay,gz[n].tax,gz[n].realWages);
      fclose(fp);
 }
 
 /*********************************************************
 Function:write 
 Description:  函数描述。在执行保存功能时被主函数调用。 函数功能。将zggz结构体数组中的记录保存到gz.dat数据文件中。
-Calls: gz.dat
+Calls: gx.dat
 *********************************************************/
 void write(int m)  /*保存文件函数*/
 {
  	int i;
  	FILE*fp;   //声明fp是指针，用来指向FILE类型的对象
- 	if ((fp=fopen("gz.dat","wb"))==NULL) //打开职工列表文件为空
+ 	if ((fp=fopen("gx.dat","wb"))==NULL) //打开职工列表文件为空
  	{
   	printf ("打开失败\n");
      	exit(0);
@@ -141,3 +141,73 @@ for (i=0;i<m;i++) /*将内存中职工的信息输出到磁盘文件中去*/
    	printf("文件读写错误\n");
    	fclose(fp);// 缓冲区内最后剩余的数据输出到磁盘文件中，并释放文件指针和有关的缓冲区
 } 
+
+
+
+/*********************************************************
+Function:modify
+Description: 函数描述。在执行修改功能时被主函数调用  函数功能。指定工号，修改该职工的工资记录，其中要调用grsds()函数计算个人所得税。
+Calls: gx.dat
+*********************************************************/
+void modify() /*修改函数*/ 
+{
+      FILE *fp;
+	 int n,i;
+     char num[5];
+    printf("要修改的职工号:");
+     scanf("%s",num);
+     for(i=0;fread(&emp[i],sizeof(struct emploee),1,fp);i++)
+    if(!strcmp(emp[i].no,num))break;
+     if(feof(fp))
+     {
+          printf("\t没有%s职工号的职工\n",num);
+          exit(2);
+     }
+     printf("工号、姓名、岗位工资、薪级工资、职务津贴、绩效工资、应发工资、个人所得税、实发工资\n");
+     printf("%6d%6s%9s%4s%5d%   %.1f   %.1f   %.1f   %.1f   %.1f   %.1f\n",n+1,gz[n].ID,gz[n].name,gz[n].postWages,
+             gz[n].paySalary,gz[n].jobAllowance,gz[n].performancePay,gz[n].shouldPay,gz[n].tax,gz[n].realWages);
+    printf("输入格式:工号、姓名、岗位工资、薪级工资、职务津贴、绩效工资、应发工资、个人所得税、实发工资 <Enter>\n");
+    printf("第%d个记录:",n+1);
+    scanf("%s%s%s%d%f%f%f%f%f",newgz.ID,newgz.name,&newgz.age,
+               &newgz.postWages,&newgz.paySalary,&newgz.jobAllowance,&newgz.performancePay,&newgz.shouldPay,&newgz.tax,&newgz.realWages);//获取新的职工记录
+             newgz.wage3=newzgz.wage1+newgz.wage2+newgz.funds-newgz.WATERfee-newgz.TAXfee;
+    fseek(fp,-(long)sizeof(struct gongzi),SEEK_CUR);  //文件指针指向该修改的记录开头
+     fwrite(&newemp,sizeof(struct gongzi),1,fp);  //用newgz覆盖当前记录
+     printf(" 修改后:\n");
+    fseek(fp,0,SEEK_SET);        //显示修改后的文件数据
+     printf("工号、姓名、岗位工资、薪级工资、职务津贴、绩效工资、应发工资、个人所得税、实发工资\n");
+     for(i=0;fread(&gz[n],sizeof(struct gongzi),1,fp)!=0;n++)
+         printf("%6d%6s%9s%4s%5d   %.1f   %.1f  %.1f   %.1f  %.1f   %.1f\n",n+1,gz[n].ID,gz[n].name,gz[n].postWages,
+             gz[n].paySalary,gz[n].jobAllowance,gz[n].performancePay,gz[n].shouldPay,gz[n].tax,gz[n].realWages);
+    fclose(fp);
+}
+/*********************************************************
+Function:find
+Description: 函数描述。在执行浏览功能时被主函数调用率。 函数功能。显示所用职工的记录。
+Calls: gx.dat
+*********************************************************/
+void find()
+{
+	{
+     FILE *fp;
+     int n; 
+     
+     if((fp=fopen("gx.dat","rb"))==NULL)
+     {
+          printf("不能打开gx文件\n");
+          exit(1);
+     }
+     printf("要查询的职工号:");
+     scanf("%s",num);
+     for(i=0;fread(&gz[n],sizeof(struct gongzi),1,fp);n++)
+         if(!strcmp(gz[n].no,num)) break;
+    if(feof(fp))
+    {
+        printf("\t查无此人\n");
+        exit(2);
+    }
+     printf("工号、姓名、岗位工资、薪级工资、职务津贴、绩效工资、应发工资、个人所得税、实发工资\n");
+     printf("%6d%6s%9s%4s%5d  %.1f  %.1f  %.1f  %.1f   %.1f   %.1f\n",n+1,gz[n].ID,gz[n].name,gz[n].postWages,
+             gz[n].paySalary,gz[n].jobAllowance,gz[n].performancePay,gz[n].shouldPay,gz[n].tax,gz[n].realWages);
+       fclose(fp);
+}
