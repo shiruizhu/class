@@ -31,10 +31,10 @@ main()
 （2）函数功能。主函数实现了系统的主界面，用户可在此界面输入查询、浏览、删除等命令。
   // 主要函数列表，每条记录应包括函数名及功能简要说明
 *********************************************************/
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include<conio.h> 
+
 #define NUM 50
 struct gongzi
 {
@@ -47,7 +47,7 @@ struct gongzi
  	float shouldPay;         //应发工资
  	float tax;       //个人所得税
 	float realWages;      //实发工资
-}gz[NUM],newgz;      
+}gz[50],newgz;      
 void menu();
 void read();
 void write();
@@ -57,21 +57,66 @@ void modify();
 void del();
 void add();
 void grsds();
-
-void menu() //菜单界面
-{  
-   int n,w1;
-  
-   { system("cls");  
-     printf("***菜单***\n\n");
-     printf("                           1  查询                           \n");
-     printf("                           2  修改                           \n");
-     printf("                           3  添加                           \n");
-     printf("                           4  删除                           \n");
-     printf("                           5  保存                           \n");
-     printf("                           6  浏览                           \n");
-     printf("                           7  退出                           \n");
+void enter();
+int load();
+int n;
+void mian()
+{   
+  menu();
 }
+void menu() //菜单界面
+{  int n,w1;
+   
+   do  
+   { system("cls");  
+     printf("***欢迎使用广西民族大学软件与信息安全学院职工工资管理系统***\n\n");
+	 printf("请选择<1-7>\n");
+     printf("          1.查询职工工资记录             \n");
+     printf("          2.修改职工工资记录             \n");
+     printf("          3.添加职工工资记录             \n");
+     printf("          4.删除职工工资记录             \n");
+     printf("          5.保存数据到文件               \n");
+     printf("          6.浏览职工记录                 \n");
+     printf("          7.退出系统                     \n");
+	 if(n<1||n>7)                                    //对选择的数字作判断
+         {
+            w1=1;
+            printf("your choice is not between 1 and 9,Please input again:");
+            getchar();
+          }
+         else    w1=0;
+      } 
+    while(w1==1);
+   
+}
+/*********************************************************
+*********************************************************/
+void enter()//录入函数
+{
+     FILE *fp;
+     int n,i;
+     if ((fp=fopen("gx.dat","wb"))==NULL)
+     {
+ 
+     printf("不能建立gx文件\n");
+     exit(1);
+     }
+     printf("输入职工人数:");
+    scanf("%d",&n);
+     printf("输入格式:工号、姓名、岗位工资、薪级工资、职务津贴、绩效工资、应发工资、个人所得税、实发工资<Enter>\n");
+     for(i=0;i<n;i++)   /*  循环获取n个职工记录 */
+     {
+         printf("第%d个职工:",i+1);
+         scanf("%s%s%s%d%f%f%f%f%f",newgz.ID,newgz.name,
+               &newgz.postWages,&newgz.paySalary,&newgz.jobAllowance,&newgz.performancePay,&newgz.shouldPay,&newgz.tax,&newgz.realWages);
+             newgz.shouldPay=newgz.postWages+newgz.paySalary+newgz.jobAllowance+newgz.performancePay;
+             newgz.realWages=newgz.shouldPay-newgz.shouldPay;
+     }
+     for(i=0;i<n;i++)      /*将n个职工记录写入文件*/
+          fwrite(&gz[i],sizeof(struct gongzi),1,fp);
+     fclose(fp);
+}
+
 /*********************************************************
 Function:read //函数名称
 Description：函数描述。主函数执行时要调用和必须调用的第一个函数。 函数功能。从数据文件中读取职工工资数据、初始化职工工资结构体数组并统计当前数据文件中职工人数，并将职工人数存在全局变量n中，以备其他函数使用。
@@ -95,20 +140,41 @@ void read()//读取函数
 		 n=0;fread(&gz[n],sizeof(struct gongzi),1,fp)!=0;
 		 n++
 	     )
-     if(gz[n],realWages>=num);
      printf("%6d%6s%9s%4s%5d   %.1f   %.1f  %.1f   %.1f   %.1f   %.1f\n",n+1,gz[n].ID,gz[n].name,gz[n].postWages,
              gz[n].paySalary,gz[n].jobAllowance,gz[n].performancePay,gz[n].shouldPay,gz[n].tax,gz[n].realWages);
      fclose(fp);
 }
 
+
+int load()  /*导入函数*/
+{
+     FILE*fp;
+     int i=0;
+     if((fp=fopen("employee_list","rb"))==NULL)
+         {
+     printf ("cannot open file\n");
+     exit(0);
+         }
+else 
+{
+  do 
+  {
+        fread(&gz,sizeof(struct gongzi),1,fp);
+        i++;
+  }
+  while(feof(fp)==0);
+}
+fclose(fp);
+return(i-1);
+}
 /*********************************************************
 Function:write 
 Description:  函数描述。在执行保存功能时被主函数调用。 函数功能。将zggz结构体数组中的记录保存到gz.dat数据文件中。
 Calls: gx.dat
 *********************************************************/
-void write(int m)  /*保存文件函数*/
+void write()  /*保存文件函数*/
 {
- 	int i;
+ 	int i,m;
  	FILE*fp;   //声明fp是指针，用来指向FILE类型的对象
  	if ((fp=fopen("gx.dat","wb"))==NULL) //打开职工列表文件为空
  	{
@@ -136,7 +202,7 @@ void modify() /*修改函数*/
      char num[5];
     printf("要修改的职工号:");
      scanf("%s",num);
-     for(i=0;fread(&gz[i],sizeof(struct emploee),1,fp);i++)
+     for(i=0;fread(&gz[i],sizeof(struct gongzi),1,fp);i++)
     if(!strcmp(gz[i].ID,num))break;
      if(feof(fp))
      {
@@ -150,8 +216,8 @@ void modify() /*修改函数*/
     printf("第%d个记录:",n+1);
     scanf("%s%s%s%d%f%f%f%f%f",newgz.ID,newgz.name,
                &newgz.postWages,&newgz.paySalary,&newgz.jobAllowance,&newgz.performancePay,&newgz.shouldPay,&newgz.tax,&newgz.realWages);//获取新的职工记录
-             newgz.shouldPay=newgz.postWages+newgz.paySalary+newgz.jobAllowance+newgz.performancePay
-             newgz.realWages=newgz.shouldPay-newgz.shouldPay
+             newgz.shouldPay=newgz.postWages+newgz.paySalary+newgz.jobAllowance+newgz.performancePay;
+             newgz.realWages=newgz.shouldPay-newgz.shouldPay;
     fseek(fp,-(long)sizeof(struct gongzi),SEEK_CUR);  //文件指针指向该修改的记录开头
      fwrite(&newgz,sizeof(struct gongzi),1,fp);  //用newgz覆盖当前记录
      printf(" 修改后:\n");
@@ -169,7 +235,7 @@ Calls: gx.dat
 *********************************************************/
 void find()//查询函数
 {
-	{
+	
      FILE *fp;
      int n;
 	 char num[5];
@@ -199,7 +265,6 @@ Calls: gx.dat
 *********************************************************/
 void list()//浏览函数
 {
-
 	int n; 
 
     FILE *fp;
@@ -209,15 +274,13 @@ void list()//浏览函数
          exit(0);
      }
      printf("工号、姓名、岗位工资、薪级工资、职务津贴、绩效工资、应发工资、个人所得税、实发工资\n");
-     for(n=0;fread(&emp[i],sizeof(struct gongzi),1,fp)!=0;n++)
+     for(n=0;fread(&gz[n],sizeof(struct gongzi),1,fp)!=0;n++)
      {
           printf("%6d%6s%9s%4s%5d  %.1f  %.1f     %.1f    %.1f    %.1f   %.1f\n",n+1,gz[n].ID,gz[n].name,gz[n].postWages,
              gz[n].paySalary,gz[n].jobAllowance,gz[n].performancePay,gz[n].shouldPay,gz[n].tax,gz[n].realWages);
-    }
+     }
     fclose(fp);
 }
-
-} 
 /*********************************************************
 Function:del
 Description: 函数描述。在执行删除功能时被主函数调用.函数功能。删除指定工号职工的记录
@@ -261,7 +324,7 @@ void del()//删除函数
 
     scanf("%d",&n); 
 
-             if(m==1) 
+             if(m==1) /*如果删除，则其他的信息都往上移一行*/
 
     { 
 
@@ -269,26 +332,10 @@ void del()//删除函数
 
       { 
 
-                strcpy(gz[j].ID,gz[j+1].ID); 
-
-                 gz[j].name=gz[j+1].name; 
-
-                 gz[j].postWages=gz[j+1].postWages; 
-
-                 gz[j].paySalary=gz[j+1].paySalary; 
-
-                 gz[j].jobAllowance=gz[j+1].jobAllowance; 
-
-                gz[j].performancePay=gz[j+1].performancePay;   
-
-                gz[j].shouldPay=gz[j+1].shouldPay; 
-
-                gz[j].tax=gz[j+1].tax; 
-				gz[j].realWages=gz[j+1].realWages;
-
+                gz[j]=gz[j+1];
       } 
 
-     . button=0; 
+      button=0; 
 
     } 
 
@@ -306,7 +353,7 @@ void del()//删除函数
 
      printf("\n 删除后的所有职工信息:\n"); 
 
-     write(m);     //调用保存函数 
+     write();     //调用保存函数 
 
      list();  //调用浏览函数 
 
@@ -352,7 +399,8 @@ void add()/*添加函数*/
          printf("追加记录:\n");
          scanf("%s%s%s%d%f%f%f%f%f",gz[n].ID,gz[n].name,gz[n].postWages,
              gz[n].paySalary,gz[n].jobAllowance,gz[n].performancePay,gz[n].shouldPay,gz[n].tax,gz[n].realWages);
-             newemp.wage3=newemp.wage1+newemp.wage2+newemp.funds-newemp.WATERfee-newemp.TAXfee;//获取一个新的职工记录
+              newgz.shouldPay=newgz.postWages+newgz.paySalary+newgz.jobAllowance+newgz.performancePay;
+             newgz.realWages=newgz.shouldPay-newgz.shouldPay;//获取一个新的职工记录
         fwrite(&newgz,sizeof(struct gongzi),1,fp);   //将该职工记录写入文件
       }
       fclose(fp);
@@ -364,21 +412,21 @@ Calls: gx.dat
 *********************************************************/
 void grads()
 {
-float Tax;  //Tax指个人所交的税//
-float shouldPay;    //shouldPay指个人的收入//
+double Tax;  //Tax指个人所交的税//
+double shouldPay;    //shouldPay指个人的收入//
 printf("请输入您的收入shouldPay:",shouldPay);
 scanf("%d",&shouldPay);
 if(shouldPay<2000)
 printf("您不用上税");
 else if(shouldPay>=2000&&shouldPay<2500)
-{Tax=0.05*(S-2000);
+{Tax=0.05*(shouldPay-2000);
 printf("您需要上的税为：%d\n",Tax);
 }
 else if(shouldPay>=2500&&shouldPay<4000)
 {Tax=0.1*(shouldPay-2000)-25;
 printf("您需要上的税为：%d\n",Tax);
 }
-else if(shouldPay>=4000&&S<7000)
+else if(shouldPay>=4000&&shouldPay<7000)
 {Tax=0.15*(shouldPay-2000)-125;
 printf("您需要上的税为：%d\n",Tax);
 }
@@ -399,7 +447,7 @@ else if(shouldPay>=62000&&shouldPay<82000)
 printf("您需要上的税为：%d\n",Tax);
 }               
 else if(shouldPay>=82000&&shouldPay<102000)
-{Tax=0.4(shouldPay-2000)-10375;
+{Tax=0.4*(shouldPay-2000)-10375;
 printf("您需要上的税为：%d\n",Tax);
 }   
 else if(shouldPay>=102000)
@@ -412,27 +460,3 @@ Function:main
 Description: 函数描述。主函数是程序执行的开始，在主函数中可调用其他函数来实现用户要求的功能。函数功能。主函数实现了系统的主界面，用户可在此界面输入查询、浏览、删除等命令。
 Calls: gx.dat
 *********************************************************/
-void mian()
-{
-	  printf("       输入您的选择(1-7):[ ]\b\b");
-  scanf("%d",&n);
-  if(n<1||n>7)                                    //对选择的数字作判断
-	{
-    w1=1;
-    printf("your choice is not between 1 and 7,Please input again:");
-    getchar();
-	}
-         else    w1=0;
-   } 
-    while(w1==1);
-  switch(n)
-  { case 1:find();    break;   
-    case 2:modify();   break;  
-    case 3:add();   break;    
-    case 4:del();   break;    
-    case 5:write();    break;    
-    case 6:list();    break;     
-    case 7:printf("\n×××××××谢谢，欢迎下次光临！×××××××\n\n");
-    default:exit(0);  //退出系统,exit(0)函数功能是退出程序。
-  }
-}
